@@ -1,5 +1,5 @@
 import React from "react";
-import Input from "./common/input";
+
 import Joi from "@hapi/joi";
 import Form from "./common/form";
 
@@ -31,31 +31,13 @@ class LoginForm extends Form {
   };
 
   render() {
-    const { data, errors } = this.state;
     return (
       <div>
         <h1>Login</h1>
         <form onSubmit={this.handleSubmit}>
-          <Input
-            name="username"
-            value={data.username}
-            label="User Name"
-            type="text"
-            error={errors.username}
-            onChange={this.handleChange}
-          />
-          <Input
-            name="password"
-            value={data.password}
-            label="Password"
-            type="password"
-            error={errors.password}
-            onChange={this.handleChange}
-          />
-
-          <button disabled={this.validate()} className="btn btn-primary">
-            Login
-          </button>
+          {this.renderInput("username", "Username")}
+          {this.renderInput("password", "password", "password")}
+          {this.renderButton("Login")}
         </form>
       </div>
     );
