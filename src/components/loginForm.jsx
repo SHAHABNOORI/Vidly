@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Input from "./common/input";
+import Joi from "@hapi/joi";
 
 class LoginForm extends Component {
   state = {
@@ -7,28 +8,58 @@ class LoginForm extends Component {
     errors: {}
   };
 
+  schema = {
+    username: Joi.string()
+      .required()
+      .label("Username"),
+    password: Joi.string()
+      .required()
+      .label("Password")
+  };
+
+  schemaObject = Joi.object(this.schema);
+
   username = React.createRef();
   password = React.createRef();
 
   validateProperty = ({ name, value }) => {
-    if (name === "username") {
-      if (value.trim() === "") return "Username is required";
-    }
+    const obj = {};
+    obj[name] = value;
+    const propertySchema = Joi.object({
+      [name]: this.schema[name]
+    });
+    const { error } = propertySchema.validate(obj);
+    return error ? error.details[0].message : null;
 
-    if (name === "password") {
-      if (value.trim() === "") return "Password is required";
-    }
+    // var { error } = propertySchema.validate(obj);
+    // if (!error) return null;
+    // return error.details[0].message;
+    // if (name === "username") {
+    //   if (value.trim() === "") return "Username is required";
+    // }
+
+    // if (name === "password") {
+    //   if (value.trim() === "") return "Password is required";
+    // }
   };
   validate = () => {
-    const { account } = this.state;
+    const options = { abortEarly: false };
+    const { error } = this.schema.validate(this.state.account, options);
+
+    if (!error) return null;
     const errors = {};
-    if (account.username.trim() === "")
-      errors.username = "Username is required";
+    for (let item of error.details) errors[item.path[0]] = item.message;
+    return errors;
 
-    if (account.password.trim() === "")
-      errors.password = "Password is required";
+    // const { account } = this.state;
+    // const errors = {};
+    // if (account.username.trim() === "")
+    //   errors.username = "Username is required";
 
-    return Object.keys(errors).length === 0 ? null : errors;
+    // if (account.password.trim() === "")
+    //   errors.password = "Password is required";
+
+    // return Object.keys(errors).length === 0 ? null : errors;
   };
   componentDidMount() {
     // this.userName.current.focus();
